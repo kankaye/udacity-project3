@@ -109,7 +109,7 @@ jobs:
         - checkout
         - run:
             name: Create Cloudformation Stack
-             command: |
+            command: |
               aws cloudformation deploy \
                 --template-file .circleci/files/backend.yml \
                 --tags project=Udacity \
