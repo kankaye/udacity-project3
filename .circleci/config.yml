@@ -84,7 +84,6 @@ jobs:
           command: |
             cd frontend
             npm install
-            npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
 
   scan-backend:
@@ -99,7 +98,6 @@ jobs:
           command: |
             cd backend
             npm install
-            npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
 
   deploy-infrastructure:
@@ -108,25 +106,58 @@ jobs:
     steps:
         - checkout
         - run:
-            name: Create Cloudformation Stack
+            name: Create BE Cloudformation Stack
             command: |
               aws cloudformation deploy \
                 --template-file .circleci/files/backend.yml \
                 --tags project=Udacity \
-                --stack-name backend-${CIRCLE_WORKFLOW_ID:0:5} \
-                --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:5}  
+                --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
+                --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+        - run:
+            name: Create FE Cloudformation Stack
+            command: |
+              aws cloudformation deploy \
+                --template-file .circleci/files/frontend.yml \
+                --tags project=Udacity \
+                --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
+                --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+        - run:
+            name: Add back-end ip to ansible inventory
+            command: |
+                aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> inventory.txt
+        - persist_to_workspace:
+            root: ~/
+            paths:
+              - project/.circleci/ansible/inventory.txt
+
+  configure-infrastructure:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["50:30:07:00:94:bf:4d:cb:21:8d:cb:07:d2:98:f1:51"]
+      - run:
+        name: Install Ansible
+        command:  |
+          apk add --update ansible
+      - run:
+        name: Run Playbook and Configure server
+        command:  |
+          ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/main.yml
+
 workflows:
   default:
     jobs:
-      # - build-frontend
-      # - build-backend
-      # - test-frontend:
-      #     requires: [build-frontend]
-      # - test-backend:
-      #     requires: [build-backend]
-      # - scan-frontend:
-      #     requires: [build-frontend]
-      # - scan-backend:
-      #     requires: [build-backend]
-      - deploy-infrastructure
+      - build-frontend
+      - build-backend
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend:
+          requires: [build-backend]
+      - scan-frontend:
+          requires: [build-frontend]
+      - scan-backend:
+          requires: [build-backend]
+      # - deploy-infrastructure
 
