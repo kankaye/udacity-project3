@@ -20,6 +20,10 @@
     state: latest
     update_cache: yes
 
+- name: Update latest version of npm
+  shell: |
+    npm install -g npm@latest
+
 - name: "install pm2"
   become: yes
   npm:
