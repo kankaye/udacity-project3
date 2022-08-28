@@ -123,14 +123,14 @@ jobs:
             name: Install tar utility
             command: |
               yum install -y tar gzip
-        - run:
-            name: Create BE Cloudformation Stack
-            command: |
-              aws cloudformation deploy \
-                --template-file .circleci/files/backend.yml \
-                --tags project=Udacity \
-                --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
-                --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+        # - run:
+        #     name: Create BE Cloudformation Stack
+        #     command: |
+        #       aws cloudformation deploy \
+        #         --template-file .circleci/files/backend.yml \
+        #         --tags project=Udacity \
+        #         --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
+        #         --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
         # - run:
         #     name: Create FE Cloudformation Stack
         #     command: |
@@ -139,11 +139,16 @@ jobs:
         #         --tags project=Udacity \
         #         --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
         #         --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+        # - run:
+        #     name: Add back-end ip to ansible inventory
+        #     command: |
+        #         echo [web] > ~/inventory.txt
+        #         aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> ~/inventory.txt
         - run:
             name: Add back-end ip to ansible inventory
             command: |
                 echo [web] > ~/inventory.txt
-                aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> ~/inventory.txt
+                echo 3.80.71.5 >> ~/inventory.txt
         - persist_to_workspace:
             root: ~/
             paths:
@@ -157,7 +162,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: ["50:30:07:00:94:bf:4d:cb:21:8d:cb:07:d2:98:f1:51"]
+          fingerprints: ["e4:1f:85:37:88:8f:00:35:d6:88:31:d0:df:f3:35:b1"]
       - attach_workspace:
           at: ~/
       - run:
