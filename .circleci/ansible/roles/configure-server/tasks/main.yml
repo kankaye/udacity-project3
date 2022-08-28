@@ -3,26 +3,26 @@
   apt:
     update_cache: yes
 
-- name: upgrade packages
-  become: yes
-  apt:
-    update_cache: yes
+# - name: upgrade packages
+#   become: yes
+#   apt:
+#     update_cache: yes
 
-- name: remove dependencies that are no longer required
-  become: yes
-  apt:
-    autoremove: yes
+# - name: remove dependencies that are no longer required
+#   become: yes
+#   apt:
+#     autoremove: yes
 
-- name: "install dependencies."
-  become: yes
-  apt:
-    name: ["nodejs", "npm"]
-    state: latest
-    update_cache: yes
+# - name: "install dependencies."
+#   become: yes
+#   apt:
+#     name: ["nodejs", "npm"]
+#     state: latest
+#     update_cache: yes
 
 - name: "download"
   become: true
-  command: curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+  command: wget -qO- https://deb.nodesource.com/setup_14.x | sudo -E bash -
   args:
     chdir: /root
 
