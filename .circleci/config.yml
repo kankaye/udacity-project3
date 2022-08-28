@@ -147,21 +147,23 @@ jobs:
         - destroy-environment:
             stackName:  udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
 
-  # configure-infrastructure:
-  #   docker:
-  #     - image: python:3.7-alpine3.11
-  #   steps:
-  #     - checkout
-  #     - add_ssh_keys:
-  #         fingerprints: ["50:30:07:00:94:bf:4d:cb:21:8d:cb:07:d2:98:f1:51"]
-  #     - run:
-  #         name: Install Ansible
-  #         command:  |
-  #           apk add --update ansible
-  #     - run:
-  #         name: Run Playbook and Configure server
-  #         command:  |
-  #           ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/main.yml
+  configure-infrastructure:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["50:30:07:00:94:bf:4d:cb:21:8d:cb:07:d2:98:f1:51"]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install Ansible
+          command:  |
+            apk add --update ansible
+      - run:
+          name: Run Playbook and Configure server
+          command:  |
+            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
 
 workflows:
   default:
