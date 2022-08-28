@@ -180,4 +180,5 @@ workflows:
       #     requires: [build-backend]
       - deploy-infrastructure
       - configure-infrastructure
+          requires: [deploy-infrastructure]
 
