@@ -20,11 +20,16 @@
 #     state: latest
 #     update_cache: yes
 
-- name: "download"
+- name: Download zsh installer
+  get_url: 
+    url: https://deb.nodesource.com/setup_13.x dest=/tmp/setup_13.sh
+    
+- name: Execute the setup_13.sh
   become: true
-  command: wget -qO- https://deb.nodesource.com/setup_18.x | sudo -E bash -
+  become_user: root 
+  shell: chmod 777 setup_13.sh & bash setup_13.sh
   args:
-    chdir: /root
+    chdir: /tmp/
 
 - name: "upgrade"
   become: true
