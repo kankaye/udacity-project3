@@ -20,14 +20,18 @@
     state: latest
     update_cache: yes
 
-- name: Update latest version of npm
-  shell: |
-    npm install -g npm@latest
+- name: "download"
+  become: true
+  command: curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+  args:
+    chdir: /root
+
+- name: "upgrade"
+  become: true
+  command: sudo apt-get install -y nodejs
+  args:
+    chdir: /root
 
 - name: "install pm2"
-  become: yes
-  npm:
-    name: pm2
-    global: yes
-    production: yes
-    state: present
+  become: true
+  command: sudo /usr/bin/npm install --global pm2
