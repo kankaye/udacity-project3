@@ -123,7 +123,7 @@ jobs:
             name: Install tar utility
             command: |
               yum install -y tar gzip
-         - run:
+        - run:
             name: Create BE Cloudformation Stack
             command: |
               aws cloudformation deploy \
