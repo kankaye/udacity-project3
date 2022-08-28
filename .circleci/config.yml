@@ -123,14 +123,14 @@ jobs:
             name: Install tar utility
             command: |
               yum install -y tar gzip
-        # - run:
-        #     name: Create BE Cloudformation Stack
-        #     command: |
-        #       aws cloudformation deploy \
-        #         --template-file .circleci/files/backend.yml \
-        #         --tags project=Udacity \
-        #         --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
-        #         --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+        - run:
+            name: Create BE Cloudformation Stack
+            command: |
+              aws cloudformation deploy \
+                --template-file .circleci/files/backend.yml \
+                --tags project=Udacity \
+                --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
+                --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
         # - run:
         #     name: Create FE Cloudformation Stack
         #     command: |
@@ -142,12 +142,12 @@ jobs:
         - run:
             name: Add back-end ip to ansible inventory
             command: |
-                echo [all] > inventory.txt
-                # aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> inventory.txt
+                echo [all] > ~/inventory.txt
+                aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> ~/inventory.txt
         - persist_to_workspace:
             root: ~/
             paths:
-              - .circleci/ansible/inventory.txt
+              - inventory.txt
         - destroy-environment:
             stackName:  udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
 
@@ -167,7 +167,7 @@ jobs:
       - run:
           name: Run Playbook and Configure server
           command:  |
-            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
+            ansible-playbook -i ~/inventory.txt .circleci/ansible/configure-server.yml
 
 workflows:
   default:
