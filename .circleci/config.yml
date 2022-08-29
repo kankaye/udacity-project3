@@ -214,8 +214,8 @@ jobs:
             name: Install tar utility
             command: |
               yum install -y tar gzip
-      - restore_cache:
-          keys: [frontend-build]
+      # - restore_cache:
+      #     keys: [frontend-build]
       - run:
           name: Install Nodejs
           command: |
@@ -254,5 +254,5 @@ workflows:
       #     requires: [deploy-infrastructure]
       # - run-migrations:
       #       requires: [build-backend]
-      - deploy-frontend:
+      - deploy-frontend
             # requires: [build-frontend]
