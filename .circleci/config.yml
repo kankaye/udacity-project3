@@ -224,6 +224,9 @@ jobs:
       - run:
           name: Install Ansible
           command:  |
+            wget https://archives.fedoraproject.org/pub/archive/epel/5/x86_64/epel-release-5-4.noarch.rpm
+            rpm –ivh epel-release-latest-5.noarch.rpm
+            yum repolist
             yum install ansible
       # - run:
       #     name: Get backend url
