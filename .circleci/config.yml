@@ -211,7 +211,6 @@ jobs:
             command: |
               yum -y update
               yum -y groupinstall "Development Tools"
-              yum -y install gcc openssl-devel bzip2-devel libffi-devel
               yum -y install python37
       - run:
             name: Install tar utility
@@ -222,12 +221,12 @@ jobs:
       - run:
           name: Install Nodejs
           command: |
-            curl -sL https://rpm.nodesource.com/setup_13.x | bash -
+            curl -sL https://rpm.nodesource.com/setup_14.x | bash -
             yum install nodejs
-      #  - run:
-      #     name: Install Ansible
-      #     command:  |
-      #       apk add --update ansible
+       - run:
+          name: Install Ansible
+          command:  |
+            apk add --update ansible
       # - run:
       #     name: Get backend url
       #     command: |
