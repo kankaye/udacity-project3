@@ -210,7 +210,7 @@ jobs:
             name: Install python
             command: |
               yum -y update
-              yum install gcc openssl-devel bzip2-devel libffi-devel zlib-devel xz-devel
+              yum -y groupinstall "Development Tools"
               yum -y install python37
       - run:
             name: Install tar utility
