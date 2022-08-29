@@ -204,14 +204,12 @@ jobs:
       - checkout
       - restore_cache:
           keys: [frontend-build]
-      # - restore_cache:
-      #     keys: [frontend-build]
-      # - python/install-packages:
-      #     pkg-manager: pip
-      # - run:
-      #       name: Install tar utility
-      #       command: |
-      #         yum install -y tar gzip
+      - python/install-packages:
+          pkg-manager: pip
+      - run:
+            name: Install tar utility
+            command: |
+              yum install -y tar gzip
       # - run:
       #     name: Install Nodejs
       #     command: |
