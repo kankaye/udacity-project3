@@ -2,6 +2,7 @@ version: 2.1
 orbs: 
   slack: circleci/slack@4.10.1
   node: circleci/node@5.0.2
+  aws-cli: circleci/aws-cli@3.1
 
 commands:
   destroy-environment:
@@ -204,30 +205,24 @@ jobs:
 
   deploy-frontend:
     docker:
-      - image: amazon/aws-cli
+      - image: python:3.8.13-alpine3.15
     steps:
       - checkout
-      - run:
-            name: Install python
-            command: |
-              yum -y update
-              yum -y groupinstall "Development Tools"
-              yum -y install python37
       - run:
             name: Install tar utility
             command: |
               yum install -y tar gzip
       # - restore_cache:
       #     keys: [frontend-build]
-      - node/install:
-          node-version: '13.8.0'
+      - aws-cli/setup
+      - run:
+          name: test aws cli
+          command:  |
+            aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress'
       - run:
           name: Install Ansible
           command:  |
-            wget https://archives.fedoraproject.org/pub/archive/epel/5/x86_64/epel-release-5-4.noarch.rpm
-            rpm –ivh epel-release-latest-5.noarch.rpm
-            yum repolist
-            yum install ansible
+            apk add --update ansible
       # - run:
       #     name: Get backend url
       #     command: |
