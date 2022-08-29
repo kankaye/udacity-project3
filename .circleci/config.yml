@@ -244,6 +244,6 @@ workflows:
       # - run-migrations:
       #       requires: [build-backend]
       - deploy-frontend
-            requires: 
-              - build-frontend
-              - deploy-infrastructure
+          requires: 
+            - build-frontend
+            - deploy-infrastructure
