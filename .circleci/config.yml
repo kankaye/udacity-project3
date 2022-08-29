@@ -220,12 +220,11 @@ jobs:
       # - restore_cache:
       #     keys: [frontend-build]
       - node/install:
-          node-version: '16.13'
-      - run: node --version
+          node-version: '13.8.0'
       - run:
           name: Install Ansible
           command:  |
-            apk add --update ansible
+            yum install ansible
       # - run:
       #     name: Get backend url
       #     command: |
