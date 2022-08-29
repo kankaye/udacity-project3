@@ -209,7 +209,7 @@ jobs:
       - run:
             name: Install python
             command: |
-              yum install python38
+              yum install python37
       - run:
             name: Install tar utility
             command: |
@@ -255,4 +255,4 @@ workflows:
       # - run-migrations:
       #       requires: [build-backend]
       - deploy-frontend:
-            requires: [build-frontend]
+            # requires: [build-frontend]
