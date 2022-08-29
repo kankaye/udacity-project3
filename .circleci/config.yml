@@ -209,7 +209,10 @@ jobs:
       - run:
             name: Install python
             command: |
-              yum install python37
+              yum -y update
+              yum -y groupinstall "Development Tools"
+              yum -y install gcc openssl-devel bzip2-devel libffi-devel
+              yum -y install python37
       - run:
             name: Install tar utility
             command: |
