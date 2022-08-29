@@ -204,8 +204,12 @@ jobs:
       - checkout
       - restore_cache:
           keys: [frontend-build]
-      - python/install-packages:
-          pkg-manager: pip
+      - run:
+            name: Install python
+            command: |
+              sudo yum -y update
+              sudo yum -y groupinstall "Development Tools"
+              sudo yum -y install gcc openssl-devel bzip2-devel libffi-devel
       - run:
             name: Install tar utility
             command: |
