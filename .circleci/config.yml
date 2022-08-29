@@ -1,6 +1,7 @@
 version: 2.1
 orbs: 
   slack: circleci/slack@4.10.1
+  node: circleci/node@x.y
 
 commands:
   destroy-environment:
@@ -218,12 +219,9 @@ jobs:
               yum install -y tar gzip
       # - restore_cache:
       #     keys: [frontend-build]
-      - run:
-          name: Install Nodejs
-          command: |
-            yum install epel-release
-            yum install nodejs
-            yum install npm
+      - node/install:
+          node-version: '16.13'
+      - run: node --version
       - run:
           name: Install Ansible
           command:  |
