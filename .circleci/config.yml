@@ -129,14 +129,14 @@ jobs:
             name: Install tar utility
             command: |
               yum install -y tar gzip
-        # - run:
-        #     name: Create BE Cloudformation Stack
-        #     command: |
-        #       aws cloudformation deploy \
-        #         --template-file .circleci/files/backend.yml \
-        #         --tags project=Udacity \
-        #         --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
-        #         --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+        - run:
+            name: Create BE Cloudformation Stack
+            command: |
+              aws cloudformation deploy \
+                --template-file .circleci/files/backend.yml \
+                --tags project=Udacity \
+                --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
+                --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
         # - run:
         #     name: Create FE Cloudformation Stack
         #     command: |
@@ -145,16 +145,11 @@ jobs:
         #         --tags project=Udacity \
         #         --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
         #         --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
-        # - run:
-        #     name: Add back-end ip to ansible inventory
-        #     command: |
-        #         echo [web] > ~/inventory.txt
-        #         aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> ~/inventory.txt
         - run:
             name: Add back-end ip to ansible inventory
             command: |
                 echo [web] > ~/inventory.txt
-                echo 3.92.204.37 >> ~/inventory.txt
+                aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> ~/inventory.txt
         - persist_to_workspace:
             root: ~/
             paths:
@@ -212,23 +207,19 @@ jobs:
             name: Install tar utility
             command: |
               apk add --update tar gzip
-      # - restore_cache:
-      #     keys: [frontend-build]
+      - restore_cache:
+          keys: [frontend-build]
       - aws-cli/setup
-      - run:
-          name: test aws cli
-          command:  |
-            aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress'
       - run:
           name: Install Ansible
           command:  |
             apk add --update ansible
-      # - run:
-      #     name: Get backend url
-      #     command: |
-      #       # your code here
-      #       export API_URL="http://${BACKEND_IP}:3030"
-      #       echo "${API_URL}"
+      - run:
+          name: Get backend url
+          command: |
+            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress')
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "${API_URL}"
       # - run:
       #     name: Deploy frontend objects
       #     command: |
@@ -247,10 +238,10 @@ workflows:
       #     requires: [build-frontend]
       # - scan-backend:
       #     requires: [build-backend]
-      # - deploy-infrastructure
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
+      - deploy-infrastructure
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
       # - run-migrations:
       #       requires: [build-backend]
       - deploy-frontend
-            # requires: [build-frontend]
+            requires: [deploy-infrastructure, build-frontend]
