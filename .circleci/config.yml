@@ -105,6 +105,10 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
+      - run:
+            name: Install tar utility
+            command: |
+              yum install -y tar gzip
       - restore_cache:
           keys: [backend-build]
       - run:
@@ -179,6 +183,10 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
+      - run:
+            name: Install tar utility
+            command: |
+              yum install -y tar gzip
       - restore_cache:
           keys: [backend-build]
       - run:
@@ -202,23 +210,21 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-      - restore_cache:
-          keys: [frontend-build]
       - run:
             name: Install python
             command: |
-              yum -y update
-              yum -y groupinstall "Development Tools"
-              yum -y install gcc openssl-devel bzip2-devel libffi-devel
+              yum install python
       - run:
             name: Install tar utility
             command: |
               yum install -y tar gzip
-      # - run:
-      #     name: Install Nodejs
-      #     command: |
-      #       curl -sL https://rpm.nodesource.com/setup_13.x | sudo bash -
-      #       yum install nodejs
+      - restore_cache:
+          keys: [frontend-build]
+      - run:
+          name: Install Nodejs
+          command: |
+            curl -sL https://rpm.nodesource.com/setup_13.x | sudo bash -
+            yum install nodejs
       #  - run:
       #     name: Install Ansible
       #     command:  |
