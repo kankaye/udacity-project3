@@ -197,6 +197,39 @@ jobs:
             fi
      # Here's where you will add some code to rollback on failure
 
+  deploy-frontend:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [frontend-build]
+      - python/install-packages:
+          pkg-manager: pip
+      - run:
+            name: Install tar utility
+            command: |
+              yum install -y tar gzip
+      - run:
+          name: Install Nodejs
+          command: |
+            curl -sL https://rpm.nodesource.com/setup_13.x | sudo bash -
+            yum install nodejs
+       - run:
+          name: Install Ansible
+          command:  |
+            apk add --update ansible
+      # - run:
+      #     name: Get backend url
+      #     command: |
+      #       # your code here
+      #       export API_URL="http://${BACKEND_IP}:3030"
+      #       echo "${API_URL}"
+      # - run:
+      #     name: Deploy frontend objects
+      #     command: |
+      #       # your code here
+      # Here's where you will add some code to rollback on failure   
 workflows:
   default:
     jobs:
@@ -213,5 +246,7 @@ workflows:
       # - deploy-infrastructure
       # - configure-infrastructure:
       #     requires: [deploy-infrastructure]
-      - run-migrations:
+      # - run-migrations:
+      #       requires: [build-backend]
+      - deploy-frontend:
             requires: [build-backend]
