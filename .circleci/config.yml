@@ -106,11 +106,7 @@ jobs:
     docker:
       - image: circleci/node:13.8.0
     steps:
-      - checkout
-      - run:
-            name: Install tar utility
-            command: |
-              yum install -y tar gzip
+      - checkout      
       - restore_cache:
           keys: [backend-build]
       - run:
@@ -210,6 +206,8 @@ jobs:
       - restore_cache:
           keys: [frontend-build]
       - aws-cli/setup
+      - node/install:
+          node-version: '13.8.0'
       - run:
           name: Install Ansible
           command:  |
@@ -246,6 +244,8 @@ jobs:
       - attach_workspace:
           at: ~/
       - aws-cli/setup
+      - node/install:
+          node-version: '13.8.0'
       - run:
           name: Install Ansible
           command:  |
