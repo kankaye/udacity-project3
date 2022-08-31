@@ -260,6 +260,11 @@ jobs:
             apt install tar gzip
       - attach_workspace:
           at: ~/
+      - run:
+          name: check BE before restoring cache
+          command: |
+            cd backend
+            ls
       - restore_cache:
           keys: [frontend-build]
       - run:
@@ -275,8 +280,8 @@ jobs:
       - run:
           name: Deploy backend
           command: |
+            cd backend
             ls
-            # cd backend
             # npm i
             # npm run build
             # cd ..
