@@ -275,7 +275,7 @@ jobs:
       - run:
           name: Install Ansible
           command:  |
-            apk add --update ansibleapk 
+            apt install ansible -y
       # - run:
       #     name: Deploy backend
       #     command: |
