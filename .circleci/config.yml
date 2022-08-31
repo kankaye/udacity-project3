@@ -214,7 +214,7 @@ jobs:
       - run:
           name: test npm
           command: |
-            npm install
+            npm –version
       # - run:
       #     name: Get backend url
       #     command: |
