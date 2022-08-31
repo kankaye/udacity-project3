@@ -212,15 +212,11 @@ jobs:
             yum -y install nodejs
 
       - run:
-          name: test npm
+          name: Get backend url
           command: |
-            npm version
-      # - run:
-      #     name: Get backend url
-      #     command: |
-      #       export BACKEND_IP=$( aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
-      #       export API_URL="http://${BACKEND_IP}:3030"
-      #       echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            export BACKEND_IP=$( aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
       # - run:
       #     name: Deploy frontend objects
       #     command: |
@@ -264,11 +260,11 @@ jobs:
       - attach_workspace:
           at: ~/
       - aws-cli/setup
-      # - run:
-      #     name: Install nodejs
-      #     command: |
-      #       apk add --update nodejs
-      #       npm --verion
+      - run:
+          name: Install nodejs
+          command: |
+            apk add --update nodejs
+            npm --verion
       # - run:
       #     name: Install Ansible
       #     command:  |
