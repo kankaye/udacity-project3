@@ -196,25 +196,21 @@ jobs:
 
   deploy-frontend:
     docker:
-      - image: python:3.8.13-alpine3.15
+      - image: amazon/aws-cli
     steps:
       - checkout
       - run:
           name: Install tar utility
           command: |
-            apk add --update tar gzip
+            yum -y install tar gzip
       - restore_cache:
           keys: [frontend-build]
-      - aws-cli/setup
       - run:
           name: Install nodejs
           command: |
-            apt-get update && apt-get upgrade -y && apt-get install -y nodejs npm
+            curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
+            yum -y install nodejs
             npm --verion
-      - run:
-          name: Install Ansible
-          command: |
-            apk add --update ansible
       # - run:
       #     name: Get backend url
       #     command: |
@@ -245,7 +241,7 @@ jobs:
           name: Add back-end ip to ansible inventory
           command: |
               echo [web] > ~/inventory.txt
-              echo 192 >> ~/inventory.txt
+              echo 3.84.250.60 >> ~/inventory.txt
       - persist_to_workspace:
           root: ~/
           paths:
@@ -264,15 +260,15 @@ jobs:
       - attach_workspace:
           at: ~/
       - aws-cli/setup
-      - run:
-          name: Install nodejs
-          command: |
-            apk add --update nodejs
-            npm --verion
-      - run:
-          name: Install Ansible
-          command:  |
-            apk add --update ansible
+      # - run:
+      #     name: Install nodejs
+      #     command: |
+      #       apk add --update nodejs
+      #       npm --verion
+      # - run:
+      #     name: Install Ansible
+      #     command:  |
+      #       apk add --update ansible
       # - run:
       #     name: Deploy backend
       #     command: |
@@ -299,19 +295,20 @@ workflows:
       #     requires: [build-frontend]
       # - scan-backend:
       #     requires: [build-backend]
-      - deploy-infrastructure
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: 
-            - build-backend
-            - configure-infrastructure
+      # - deploy-infrastructure
+      # - configure-infrastructure:
+      #     requires: [deploy-infrastructure]
+      # - run-migrations:
+      #     requires: 
+      #       - build-backend
+      #       - configure-infrastructure
+      - test
       - deploy-frontend:
           requires: 
             - build-frontend
-            - configure-infrastructure
+            # - configure-infrastructure
       - deploy-backend:
           requires:
             - build-backend
-            - run-migrations
+            # - run-migrations
 
