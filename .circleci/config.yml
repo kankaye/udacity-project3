@@ -51,7 +51,7 @@ jobs:
             npm install
             npm run build
       - save_cache:
-          paths: [~/.cache/backend/node_modules]
+          paths: [backend/node_modules]
           key: backend-build
       - slack/notify:
           event: fail
@@ -218,17 +218,17 @@ jobs:
             export BACKEND_IP=$( aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
-      # - run:
-      #     name: Deploy frontend objects
-      #     command: |
-      #       cd frontend
-      #       npm install
-      #       npm run build
-      #       tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
-      #       aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd frontend
+            npm install
+            npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       # Here's where you will add some code to rollback on failure
-      # - destroy-environment:
-      #       stackName:  udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+      - destroy-environment:
+            stackName:  udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
   test:
     docker:
       - image: amazon/aws-cli
@@ -264,14 +264,6 @@ jobs:
       - restore_cache:
           keys: [backend-build]
       - run:
-          name: check BE before restoring cache
-          command: |
-            cd ~/project
-            ls
-            echo -----------------------------
-            cd ~/project/backend
-            ls
-      - run:
           name: Install nodejs
           command: |
             curl -fsSL https://deb.nodesource.com/setup_13.x | bash -
@@ -285,7 +277,7 @@ jobs:
           name: Deploy backend
           command: |
             cd backend
-            npm i --cache ~/.cache/backend/node_modules
+            npm i
             npm run build
             cd ..
             tar -C backend -czvf artifact.tar.gz .
@@ -294,34 +286,70 @@ jobs:
             cat ~/inventory.txt
             ansible-playbook -i ~/inventory.txt deploy-backend.yml
       # Here's where you will add some code to rollback on failure  
+
+  smoke-test:
+    docker:
+      - image: curlimages/curl:latest 
+    steps:
+      - checkout
+      - aws-cli/setup
+      - run:
+          name: Get backend url
+          command: |
+            export BACKEND_IP=$( aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+      - run:
+          name: Backend smoke test.
+          command: |
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "${API_URL}"
+            if curl "${API_URL}/api/status" | grep "ok"
+            then
+                return 0
+            else
+                return 1
+            fi
+      - run:
+          name: Frontend smoke test.
+          command: |
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"            
+            echo ${URL} 
+            if curl -s ${URL} | grep "Welcome"
+            then
+                # Change this to 0 after the job fails
+              return 1
+            else
+              return 1
+            fi
 workflows:
   default:
     jobs:
       - build-frontend
       - build-backend
-      # - test-frontend:
-      #     requires: [build-frontend]
-      # - test-backend:
-      #     requires: [build-backend]
-      # - scan-frontend:
-      #     requires: [build-frontend]
-      # - scan-backend:
-      #     requires: [build-backend]
-      # - deploy-infrastructure
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
-      # - run-migrations:
-      #     requires: 
-      #       - build-backend
-      #       - configure-infrastructure
-      - test
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend:
+          requires: [build-backend]
+      - scan-frontend:
+          requires: [build-frontend]
+      - scan-backend:
+          requires: [build-backend]
+      - deploy-infrastructure
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
+      - run-migrations:
+          requires: 
+            - build-backend
+            - configure-infrastructure
+      # - test
       - deploy-frontend:
           requires: 
             - build-frontend
-            # - configure-infrastructure
+            - configure-infrastructure
       - deploy-backend:
           requires:
-            - test
+            # - test
             - build-backend
-            # - run-migrations
+            - run-migrations
 
