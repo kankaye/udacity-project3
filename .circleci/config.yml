@@ -265,8 +265,8 @@ jobs:
       - run:
           name: Install nodejs
           command: |
-            curl -sL https://rpm.nodesource.com/setup_13.x | bash -
-            apt install nodejs
+            curl -fsSL https://deb.nodesource.com/setup_13.x | bash -
+            apt-get install -y nodejs
       - run:
           name: test python
           command:  |
