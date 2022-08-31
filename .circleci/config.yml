@@ -208,7 +208,7 @@ jobs:
       - run:
           name: Install nodejs
           command: |
-            curl -sL https://rpm.nodesource.com/setup_13.8.0 | bash -
+            curl -sL https://rpm.nodesource.com/setup_13.x | bash -
             yum -y install nodejs
 
       - run:
