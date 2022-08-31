@@ -210,6 +210,10 @@ jobs:
           command: |
             curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
             yum -y install nodejs
+
+      - run:
+          name: test npm
+          command: |
             npm --verion
       # - run:
       #     name: Get backend url
