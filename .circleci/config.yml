@@ -264,7 +264,7 @@ jobs:
           name: Install nodejs
           command: |
             apk add --update npm
-            npm verion
+            npm install
       # - run:
       #     name: Install Ansible
       #     command:  |
