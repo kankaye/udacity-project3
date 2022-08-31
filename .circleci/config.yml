@@ -200,36 +200,56 @@ jobs:
     steps:
       - checkout
       - run:
-            name: Install tar utility
-            command: |
-              apk add --update tar gzip
+          name: Install tar utility
+          command: |
+            apk add --update tar gzip
       - restore_cache:
           keys: [frontend-build]
       - aws-cli/setup
-      - node/install:
-          node-version: '13.8.0'
+      - run:
+          name: Install nodejs
+          command: |
+            apk add --update nodejs
+            npm --verion
       - run:
           name: Install Ansible
-          command:  |
+          command: |
             apk add --update ansible
-      - run:
-          name: Get backend url
-          command: |
-            export BACKEND_IP=$( aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
-            export API_URL="http://${BACKEND_IP}:3030"
-            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
-      - run:
-          name: Deploy frontend objects
-          command: |
-            cd frontend
-            npm install
-            npm run build
-            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
-            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      # - run:
+      #     name: Get backend url
+      #     command: |
+      #       export BACKEND_IP=$( aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+      #       export API_URL="http://${BACKEND_IP}:3030"
+      #       echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+      # - run:
+      #     name: Deploy frontend objects
+      #     command: |
+      #       cd frontend
+      #       npm install
+      #       npm run build
+      #       tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+      #       aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       # Here's where you will add some code to rollback on failure
       - destroy-environment:
             stackName:  udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
-  
+  test:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install tar utility
+          command: |
+            yum install -y tar gzip
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+              echo [web] > ~/inventory.txt
+              echo 192 >> ~/inventory.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - inventory.txt
   deploy-backend:
     docker:
       - image: python:3.8.13-alpine3.15
@@ -244,38 +264,41 @@ jobs:
       - attach_workspace:
           at: ~/
       - aws-cli/setup
-      - node/install:
-          node-version: '13.8.0'
+      - run:
+          name: Install nodejs
+          command: |
+            apk add --update nodejs
+            npm --verion
       - run:
           name: Install Ansible
           command:  |
             apk add --update ansible
-      - run:
-          name: Deploy backend
-          command: |
-            cd backend
-            npm i
-            npm run build
-            cd ..
-            tar -C backend -czvf artifact.tar.gz .
-            cd .circleci/ansible
-            echo "Contents  of the inventory.txt file is -------"
-            cat inventory.txt
-            ansible-playbook -i inventory.txt deploy-backend.yml
+      # - run:
+      #     name: Deploy backend
+      #     command: |
+      #       cd backend
+      #       npm i
+      #       npm run build
+      #       cd ..
+      #       tar -C backend -czvf artifact.tar.gz .
+      #       cd .circleci/ansible
+      #       echo "Contents  of the inventory.txt file is -------"
+      #       cat inventory.txt
+      #       ansible-playbook -i inventory.txt deploy-backend.yml
       # Here's where you will add some code to rollback on failure  
 workflows:
   default:
     jobs:
       - build-frontend
       - build-backend
-      - test-frontend:
-          requires: [build-frontend]
-      - test-backend:
-          requires: [build-backend]
-      - scan-frontend:
-          requires: [build-frontend]
-      - scan-backend:
-          requires: [build-backend]
+      # - test-frontend:
+      #     requires: [build-frontend]
+      # - test-backend:
+      #     requires: [build-backend]
+      # - scan-frontend:
+      #     requires: [build-frontend]
+      # - scan-backend:
+      #     requires: [build-backend]
       - deploy-infrastructure
       - configure-infrastructure:
           requires: [deploy-infrastructure]
@@ -289,5 +312,6 @@ workflows:
             - configure-infrastructure
       - deploy-backend:
           requires:
+            - build-backend
             - run-migrations
 
