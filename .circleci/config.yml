@@ -156,7 +156,7 @@ jobs:
 
   configure-infrastructure:
     docker:
-      - image: circleci/python:3.8.1
+      - image: python:3.8.13-alpine3.15
     steps:
       - checkout
       - add_ssh_keys:
