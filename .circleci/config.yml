@@ -155,7 +155,7 @@ jobs:
 
   configure-infrastructure:
     docker:
-      - image: python:3.8.13-alpine3.15
+      - image: circleci/python:3.8.1
     steps:
       - checkout
       - add_ssh_keys:
@@ -248,7 +248,7 @@ jobs:
             - inventory.txt
   deploy-backend:
     docker:
-      - image: amazon/aws-cli
+      - image: python:3.8-buster
     steps:
       - checkout
       - add_ssh_keys:
