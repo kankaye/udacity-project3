@@ -205,11 +205,15 @@ jobs:
             yum -y install tar gzip
       - restore_cache:
           keys: [frontend-build]
-      - run:
-          name: Install nodejs
-          command: |
-            curl -sL https://rpm.nodesource.com/setup_13.x | bash -
-            yum -y install nodejs
+      # - run:
+      #     name: Install nodejs
+      #     command: |
+      #       curl -sL https://rpm.nodesource.com/setup_13.x | bash -
+      #       yum -y install nodejs
+
+      - node/install:
+          node-version: '16.13'
+      - run: node --version
 
       - run:
           name: Get backend url
