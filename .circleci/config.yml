@@ -59,6 +59,7 @@ jobs:
       - slack/notify:
           event: pass
           template: success_tagged_deploy_1
+  
   test-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -260,13 +261,15 @@ jobs:
             apt install tar gzip
       - attach_workspace:
           at: ~/
+      - restore_cache:
+          keys: [backend-build]
       - run:
           name: check BE before restoring cache
           command: |
-            cd backend
             ls
-      - restore_cache:
-          keys: [backend-build]
+            echo -----------------------------
+            cd ~/
+            ls
       - run:
           name: Install nodejs
           command: |
