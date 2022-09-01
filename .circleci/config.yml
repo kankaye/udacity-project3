@@ -307,7 +307,7 @@ jobs:
       - run:
           name: Frontend smoke test.
           command: |
-            URL="http://udapeople-45e237d.s3-website-us-east-1.amazonaws.com/#/employees"            
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"            
             echo ${URL} 
             if curl -s ${URL} | grep "Welcome"
             then
@@ -323,32 +323,32 @@ workflows:
       - build-backend
       # - test-frontend:
       #     requires: [build-frontend]
-      # - test-backend:
-      #     requires: [build-backend]
-      # - scan-frontend:
-      #     requires: [build-frontend]
-      # - scan-backend:
-      #     requires: [build-backend]
-      # - deploy-infrastructure
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
-      # - run-migrations:
-      #     requires: 
-      #       - build-backend
-      #       - configure-infrastructure
-      # # - test
-      # - deploy-frontend:
-      #     requires: 
-      #       - build-frontend
-      #       - configure-infrastructure
-      # - deploy-backend:
-      #     requires:
-      #       # - test
-      #       - build-backend
-      #       - run-migrations
+      - test-backend:
+          requires: [build-backend]
+      - scan-frontend:
+          requires: [build-frontend]
+      - scan-backend:
+          requires: [build-backend]
+      - deploy-infrastructure
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
+      - run-migrations:
+          requires: 
+            - build-backend
+            - configure-infrastructure
+      # - test
+      - deploy-frontend:
+          requires: 
+            - build-frontend
+            - configure-infrastructure
+      - deploy-backend:
+          requires:
+            # - test
+            - build-backend
+            - run-migrations
       - smoke-test:
           requires:
             - build-backend
-            # - deploy-backend
-            # - deploy-frontend
+            - deploy-backend
+            - deploy-frontend
 
