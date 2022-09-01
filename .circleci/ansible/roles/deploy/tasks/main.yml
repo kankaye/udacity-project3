@@ -1,7 +1,7 @@
 - name: Creates Directory
   become: yes
   file:
-    path: ~/backend
+    path: /home/ubuntu/backend
     state: directory
     mode: 0777
 
