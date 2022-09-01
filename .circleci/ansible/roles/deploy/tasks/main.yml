@@ -5,11 +5,6 @@
     state: directory
     mode: 0777
 
-- name: test
-  become: yes
-  shell: |
-    ls
-
 - name: Copy backend dist files web server
   become: yes
   copy:
@@ -21,11 +16,12 @@
   shell: |
     cd /home/ubuntu/backend
     tar -vxf artifact.tar.gz
+    rm artifact.tar.gz
 
 - name: "Start app"
   become: true
   shell: |
-    sudo pm2 stop default
+    pm2 stop default
     pm2 start npm -- start "backend" -- run start
   args:
     chdir: /home/ubuntu/

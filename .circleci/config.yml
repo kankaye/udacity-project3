@@ -277,6 +277,7 @@ jobs:
           name: Prepare artifact
           command: |
             cd backend
+            echo TYPEORM_HOST=$TYPEORM_HOST >> ".env"
             npm i
             npm run build
             cd ..
