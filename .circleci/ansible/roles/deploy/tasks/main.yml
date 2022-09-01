@@ -5,6 +5,11 @@
     state: directory
     mode: 0777
 
+- name: test
+  become: yes
+  shell: |
+    ls
+
 - name: Copy backend dist files web server
   become: yes
   copy:
@@ -20,7 +25,6 @@
 - name: "Start app"
   become: true
   shell: |
-    npm install
     sudo pm2 stop default
     pm2 start npm -- start "backend" -- run start
   args:
