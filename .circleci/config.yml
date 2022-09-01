@@ -296,7 +296,7 @@ jobs:
           name: Get backend url
           command: |
             export BACKEND_IP=$( aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
-            export API_URL="http://${BACKEND_IP}:3030"
+            echo 'export API_URL="http://${BACKEND_IP}:3030"' >> >> $BASH_ENV
       - run:
           name: Backend smoke test.
           command: |
