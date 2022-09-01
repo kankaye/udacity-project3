@@ -292,17 +292,18 @@ jobs:
       - image: curlimages/curl:latest 
     steps:
       - checkout
-      - aws-cli/setup
+      - run:
+          name: Install aws-cli
+          command: |
+            apk add --no-cache aws-cli
       - run:
           name: Get backend url
           command: |
             export BACKEND_IP=$( aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
             export API_URL="http://${BACKEND_IP}:3030"
-            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
       - run:
           name: Backend smoke test.
           command: |
-            export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
             then
@@ -313,7 +314,7 @@ jobs:
       - run:
           name: Frontend smoke test.
           command: |
-            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"            
+            URL="http://udapeople-45e237d.s3-website-us-east-1.amazonaws.com/#/employees"            
             echo ${URL} 
             if curl -s ${URL} | grep "Welcome"
             then
@@ -327,33 +328,34 @@ workflows:
     jobs:
       - build-frontend
       - build-backend
-      - test-frontend:
-          requires: [build-frontend]
-      - test-backend:
-          requires: [build-backend]
-      - scan-frontend:
-          requires: [build-frontend]
-      - scan-backend:
-          requires: [build-backend]
-      - deploy-infrastructure
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: 
-            - build-backend
-            - configure-infrastructure
-      # - test
-      - deploy-frontend:
-          requires: 
-            - build-frontend
-            - configure-infrastructure
-      - deploy-backend:
-          requires:
-            # - test
-            - build-backend
-            - run-migrations
+      # - test-frontend:
+      #     requires: [build-frontend]
+      # - test-backend:
+      #     requires: [build-backend]
+      # - scan-frontend:
+      #     requires: [build-frontend]
+      # - scan-backend:
+      #     requires: [build-backend]
+      # - deploy-infrastructure
+      # - configure-infrastructure:
+      #     requires: [deploy-infrastructure]
+      # - run-migrations:
+      #     requires: 
+      #       - build-backend
+      #       - configure-infrastructure
+      # # - test
+      # - deploy-frontend:
+      #     requires: 
+      #       - build-frontend
+      #       - configure-infrastructure
+      # - deploy-backend:
+      #     requires:
+      #       # - test
+      #       - build-backend
+      #       - run-migrations
       - smoke-test:
           requires:
-            - deploy-backend
-            - deploy-frontend
+            - build-backend
+            # - deploy-backend
+            # - deploy-frontend
 
