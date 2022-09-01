@@ -13,8 +13,8 @@
 - name: Copy backend dist files web server
   become: yes
   copy:
-    src: ~/project/artifact.tar.gz
-    dest: ~/backend/artifact.tar.gz
+    src:  /root/project/artifact.tar.gz
+    dest: /home/ubuntu/backend/artifact.tar.gz
 
 - name: Extract backend files
   become: yes
