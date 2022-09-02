@@ -202,7 +202,6 @@ jobs:
           keys: [backend-build]
       - run:
           name: Install nodejs
-          when: on_fail
           command: |
             curl -sL https://rpm.nodesource.com/setup_13.x | bash -
             yum -y install nodejs
