@@ -34,3 +34,9 @@
   args:
     chdir: /home/ubuntu//backend/dist    
   register: shell_output
+
+- name: npm start
+  become: yes
+  shell: |
+    cd /home/ubuntu/backend
+    npm run start
