@@ -7,16 +7,35 @@ orbs:
 commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-    parameters:
-      stackName:
-        type: string   
     steps:
       - run:
           name: Destroy environments
           when: on_fail
           command: |
-            aws cloudformation delete-stack --stack-name <<parameters.stackName>>
-       
+            aws s3 rm s3://udapeople-"${CIRCLE_WORKFLOW_ID:0:7}" --recursive
+            aws s3 rb s3://udapeople-"${CIRCLE_WORKFLOW_ID:0:7}" --force
+            aws cloudformation delete-stack --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
+            aws cloudformation delete-stack --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
+  
+  revert-migrations:
+    description: Revert the last migration if successfully run in the current workflow.
+    parameters:
+      workflow_id:
+        - type: string
+    steps:
+      - run:
+          name: Revert migrations
+          when: on_fail
+          command: |
+            # export SUCCESS=$(curl --insecure  https://kvdb.io/AnCL2AcTbjnej3iwokxmCv/migration_<< parameters.workflow_id >>)
+            export SUCCESS=1
+            if(( $SUCCESS==1 )); 
+            then
+              cd ~/project/backend
+              npm install
+              npm run migration:revert
+              exit 1
+            fi     
 jobs:
   build-frontend:
     docker:
@@ -226,9 +245,7 @@ jobs:
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      # Here's where you will add some code to rollback on failure
-      - destroy-environment:
-            stackName:  udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+      - destroy-environment
   test:
     docker:
       - image: amazon/aws-cli
@@ -304,7 +321,7 @@ jobs:
             echo "Contents  of the inventory.txt file is -------"
             cat ~/inventory.txt
             ansible-playbook -i ~/inventory.txt deploy-backend.yml
-      # Here's where you will add some code to rollback on failure  
+      - destroy-environment
 
   smoke-test:
     docker:
@@ -335,6 +352,10 @@ jobs:
             else
               exit 1
             fi
+      - destroy-environment
+      - revert-migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      
 workflows:
   default:
     jobs:
