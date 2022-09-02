@@ -13,13 +13,6 @@
   apt:
     autoremove: yes
 
-- name: "install dependencies."
-  become: yes
-  apt:
-    name: ["nodejs", "npm"]
-    state: latest
-    update_cache: yes
-
 - name: Download zsh installer
   get_url: 
     url: https://deb.nodesource.com/setup_13.x 
@@ -34,10 +27,10 @@
 
 - name: "upgrade"
   become: true
-  command: sudo apt-get install -y nodejs
+  command: apt-get install -y nodejs
   args:
     chdir: /root
 
 - name: "install pm2"
   become: true
-  command: sudo /usr/bin/npm install --global pm2
+  command: npm install --global pm2

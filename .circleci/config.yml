@@ -360,14 +360,15 @@ workflows:
       #     requires: 
       #       - build-frontend
       #       - configure-infrastructure
-      - deploy-backend:
+      # - deploy-backend:
+      #     requires:
+      #       - test
+      #       - build-backend
+      #       # - run-migrations
+      - smoke-test:
           requires:
             - test
-            - build-backend
-            # - run-migrations
-      # - smoke-test:
-      #     requires:
-      #       - build-backend
-      #       - deploy-backend
-      #       - deploy-frontend
+            # - build-backend
+            # - deploy-backend
+            # - deploy-frontend
 
