@@ -30,7 +30,8 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            export SUCCESS=$(curl --insecure  https://kvdb.io/AnCL2AcTbjnej3iwokxmCv/migration_<< parameters.workflow_id >>)
+            # export SUCCESS=$(curl --insecure  https://kvdb.io/AnCL2AcTbjnej3iwokxmCv/migration_<< parameters.workflow_id >>)
+            export SUCCESS=1
             if(( $SUCCESS==1 )); 
             then
               cd ~/project/backend
@@ -194,11 +195,17 @@ jobs:
 
   run-migrations:
     docker:
-      - image: circleci/node:13.8.0
+      - image: amazon/aws-cli
     steps:
       - checkout
       - restore_cache:
           keys: [backend-build]
+      - run:
+          name: Install nodejs
+          when: on_fail
+          command: |
+            curl -sL https://rpm.nodesource.com/setup_13.x | bash -
+            yum -y install nodejs
       - run:
           name: Run migrations
           command: |
@@ -208,6 +215,7 @@ jobs:
       - run:
           name: Send migration results to kvdb.io
           command: |
+            echo "insecure" >> ~/.curlrc
             cat ~/project/backend/migrations_dump.txt
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
