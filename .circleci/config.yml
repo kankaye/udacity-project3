@@ -364,9 +364,13 @@ jobs:
       - run:
           name: Update cloudfront distribution
           command: |
+            export OldWorkflowID=$(aws cloudformation \
+                    list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+                    --no-paginate --output text)
+
             aws cloudformation deploy \
             --template-file .circleci/files/cloudfront.yml \
-            --stack-name udapeople-cloudfront-${CIRCLE_WORKFLOW_ID:0:7} \
+            --stack-name udapeople-cloudfront-${OldWorkflowID} \
             --parameter-overrides WorkflowID=${CIRCLE_WORKFLOW_ID:0:7} \
             --tags project=udapeople
 
@@ -432,5 +436,5 @@ workflows:
       #       - deploy-backend
       #       - deploy-frontend
       - cloudfront-update
-      - cleanup
+      # - cleanup
 
