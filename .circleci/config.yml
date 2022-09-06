@@ -435,6 +435,9 @@ workflows:
       #       - build-backend
       #       - deploy-backend
       #       - deploy-frontend
-      - cloudfront-update
+      - cloudfront-update:
+          requires:
+            - deploy-frontend
+            - deploy-backend
       # - cleanup
 
