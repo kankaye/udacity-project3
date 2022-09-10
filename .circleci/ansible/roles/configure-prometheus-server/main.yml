@@ -1,0 +1,82 @@
+- name: Create a user for Prometheus
+  become: true
+  become_user: root 
+  shell: |
+    useradd --no-create-home prometheus
+    mkdir /etc/prometheus
+    mkdir /var/lib/prometheus
+
+- name: "install prometheus"
+  unarchive:
+    src: https://github.com/prometheus/prometheus/releases/download/v2.19.0/prometheus-2.19.0.linux-amd64.tar.gz
+    dest: /tmp
+    remote_src: yes
+
+- name: Copy
+  become: true
+  become_user: root 
+  shell: |
+    sudo cp /tmp/prometheus-2.19.0.linux-amd64/prometheus /usr/local/bin
+    sudo cp /tmp/prometheus-2.19.0.linux-amd64/promtool /usr/local/bin/
+    sudo cp -r /tmp/prometheus-2.19.0.linux-amd64/consoles /etc/prometheus
+    sudo cp -r /tmp/prometheus-2.19.0.linux-amd64/console_libraries /etc/prometheus
+    sudo cp /tmp/prometheus-2.19.0.linux-amd64/promtool /usr/local/bin/
+    rm -rf /tmp/prometheus-2.19.0.linux-amd64.tar.gz prometheus-2.19.0.linux-amd64
+
+- name: "add prometheus config"
+  become: true
+  copy:
+    src: prometheus.yml
+    dest: /etc/prometheus/
+
+- name: "add prometheus service configuration."
+  become: true
+  copy:
+    src: prometheus.service
+    dest: /etc/systemd/system/
+
+- name: Change permission
+  become: true
+  become_user: root 
+  shell: |
+    sudo chown prometheus:prometheus /etc/prometheus
+    sudo chown prometheus:prometheus /usr/local/bin/prometheus
+    sudo chown prometheus:prometheus /usr/local/bin/promtool
+    sudo chown -R prometheus:prometheus /etc/prometheus/consoles
+    sudo chown -R prometheus:prometheus /etc/prometheus/console_libraries
+    sudo chown -R prometheus:prometheus /var/lib/prometheus
+
+- name: "enable prometheus service"
+  become: true
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: prometheus
+    enabled: yes
+    
+- name: "install alert manager"
+  unarchive:
+    src: https://github.com/prometheus/alertmanager/releases/download/v0.21.0/alertmanager-0.21.0.linux-amd64.tar.gz
+    dest: /tmp
+    remote_src: yes
+
+- name: Copy
+  become: true
+  become_user: root 
+  shell: |
+    sudo cp /tmp/alertmanager-0.21.0.linux-amd64/alertmanager /usr/local/bin
+    sudo cp /tmp/alertmanager-0.21.0.linux-amd64/amtool /usr/local/bin/
+    sudo mkdir /var/lib/alertmanager
+    rm -rf /tmp/alertmanager*
+
+- name: "add alertmanager config"
+  become: true
+  copy:
+    src: alertmanager.yml
+    dest: /etc/alertmanager/
+
+- name: "add alertmanager service configuration."
+  become: true
+  copy:
+    src: alertmanager.service
+    dest: /etc/systemd/system/

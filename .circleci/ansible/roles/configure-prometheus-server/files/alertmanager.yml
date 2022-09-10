@@ -1,0 +1,13 @@
+route:
+  group_by: [Alertname]
+  receiver: email-me
+
+receivers:
+- name: email-me
+  email_configs:
+  - to: hocpluralsight14@gmail.com
+    from: hocpluralsight13@gmail.com
+    smarthost: smtp.gmail.com:587
+    auth_username: hocpluralsight13@gmail.com
+    auth_identity: hocpluralsight13@gmail.com
+    auth_password: YOUR_EMAIL_PASSWORD
