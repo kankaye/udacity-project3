@@ -426,14 +426,15 @@ workflows:
           requires:
             - build-backend
             - run-migrations
-      - smoke-test:
-          requires:
-            - build-backend
-            - deploy-backend
-            - deploy-frontend
+      # - smoke-test:
+      #     requires:
+      #       - build-backend
+      #       - deploy-backend
+      #       - deploy-frontend
       - cloudfront-update:
           requires:
             - deploy-frontend
             - deploy-backend
-      - cleanup
-
+      - cleanup:
+          requires:
+            - cloudfront-update
