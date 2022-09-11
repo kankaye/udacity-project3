@@ -92,7 +92,7 @@
   systemd:
     state: restarted
     daemon_reload: yes
-    name: prometalertmanagerheus
+    name: alertmanager
     enabled: yes
 
 - name: configure prometheus
