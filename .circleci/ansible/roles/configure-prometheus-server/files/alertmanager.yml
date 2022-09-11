@@ -1,13 +1,12 @@
+global:
+  resolve_timeout: 1m
+  slack_api_url: 'https://hooks.slack.com/services/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'
 route:
   group_by: [Alertname]
-  receiver: email-me
+  receiver: slack-notification
 
 receivers:
-- name: email-me
-  email_configs:
-  - to: hocpluralsight14@gmail.com
-    from: hocpluralsight13@gmail.com
-    smarthost: smtp.gmail.com:587
-    auth_username: hocpluralsight13@gmail.com
-    auth_identity: hocpluralsight13@gmail.com
-    auth_password: YOUR_EMAIL_PASSWORD
+- name: slack-notification
+  slack_configs:
+  - channel: '#general'
+    send_resolved: true

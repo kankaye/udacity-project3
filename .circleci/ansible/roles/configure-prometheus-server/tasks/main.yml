@@ -73,10 +73,36 @@
   become: true
   copy:
     src: alertmanager.yml
-    dest: /etc/alertmanager/
+    dest: /etc/prometheus/
+
+- name: "add rules config"
+  become: true
+  copy:
+    src: rules.yml
+    dest: /etc/prometheus/
 
 - name: "add alertmanager service configuration."
   become: true
   copy:
     src: alertmanager.service
     dest: /etc/systemd/system/
+
+- name: "enable alert manager service"
+  become: true
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: prometalertmanagerheus
+    enabled: yes
+
+- name: configure prometheus
+  become: true
+  become_user: root 
+  shell: |
+    chown -R prometheus:prometheus /etc/prometheus
+
+- name: "add new prometheus configuration."
+  become: true
+  copy:
+    src: prometheus2.yml
+    dest: /etc/prometheus/prometheus.yml
