@@ -198,6 +198,7 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
+      - aws-cli/setup
       - restore_cache:
           keys: [backend-build]
       - run:
